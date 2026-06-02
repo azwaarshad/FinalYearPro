@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinalYearPro — Smart Career System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body,#root{height:100%}
+    body{font-family:'DM Sans','Segoe UI',sans-serif;background:#F5F7FA}
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:#F5F7FA}
+    ::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:99px}
+    select,input,button,textarea{font-family:inherit}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useRef,useEffect}=React;
+
+// ── Tokens ────────────────────────────────────────────────────────────────────
+const T={
+  ink:"#0D1117",inkL:"#161B27",inkLL:"#1F2937",
+  teal:"#0EA5A0",tealL:"#14B8B3",tealD:"#0A7A76",
+  gold:"#F59E0B",rose:"#F43F5E",violet:"#8B5CF6",
+  emerald:"#10B981",sky:"#38BDF8",
+  bg:"#F5F7FA",card:"#FFFFFF",border:"#E4E9F0",
+  text:"#111827",muted:"#6B7280",light:"#D1D5DB"
+};
+const AC=[
+  {b:"#0EA5A0",t:"#fff"},{b:"#8B5CF6",t:"#fff"},{b:"#F43F5E",t:"#fff"},
+  {b:"#F59E0B",t:"#fff"},{b:"#10B981",t:"#fff"},{b:"#38BDF8",t:"#0D1117"},
+  {b:"#F97316",t:"#fff"},{b:"#EC4899",t:"#fff"},{b:"#06B6D4",t:"#fff"},
+  {b:"#84CC16",t:"#fff"},{b:"#EF4444",t:"#fff"},{b:"#A855F7",t:"#fff"},
+  {b:"#14B8A6",t:"#fff"},{b:"#6366F1",t:"#fff"},{b:"#22C55E",t:"#fff"},
+  {b:"#FB923C",t:"#fff"},{b:"#0EA5E8",t:"#fff"}
+];
+
+// ── Student Data ──────────────────────────────────────────────────────────────
+const STUDENTS=[
+  {id:1,name:"Waleha Batool",ini:"WB",sid:"S23CSC015",email:"walehabatoolrizvi@gmail.com",phone:"03012500298",gender:"Female",uni:"Salim Habib University",deg:"BSCS",yr:4,sem:7,cgpa:3.00,interests:["AI/ML","Data Science"],goal:"Job at company",work:"Onsite",skills:"Ms Office, Programming",active:"Programming",role:"Backend Developer",ready:76,pskills:[{n:"Programming",v:70},{n:"MS Office",v:65},{n:"Data Analysis",v:55}],status:"On Track"},
+  {id:2,name:"Azwa Arshad",ini:"AA",sid:"S23CSC001",email:"azwaarshad2992@gmail.com",phone:"03302065978",gender:"Female",uni:"Salim Habib University",deg:"BSCS",yr:4,sem:7,cgpa:3.56,interests:["AI/ML","Web Development","Data Science"],goal:"Job at company",work:"Onsite",skills:"Python, SQL",active:"Python, SQL",role:"ML Engineer",ready:81,pskills:[{n:"Python",v:85},{n:"SQL",v:78},{n:"Machine Learning",v:72}],status:"Excellent"},
+  {id:3,name:"Taqdees Zahra",ini:"TZ",sid:"F24ARM003",email:"kontacttaqdees@gmail.com",phone:"03002556911",gender:"Female",uni:"Salim Habib University",deg:"BS Actuarial Science",yr:2,sem:4,cgpa:3.70,interests:["Web Development","Cybersecurity"],goal:"Startup",work:"Remote",skills:"C++/Python, Web development, Technical support",active:"Programming, graphic designing",role:"Web & Risk Tech",ready:62,pskills:[{n:"Python/C++",v:58},{n:"Web Development",v:55},{n:"Graphic Design",v:60}],status:"Moderate"},
+  {id:4,name:"Akhter Hussain",ini:"AH",sid:"F22CSC005",email:"akhterkhatriii@gmail.com",phone:"03323002231",gender:"Male",uni:"Salim Habib University",deg:"BSCS",yr:4,sem:7,cgpa:2.80,interests:["Data Science"],goal:"Freelancing",work:"Hybrid",skills:"Java, Python, Backend development",active:"Backend",role:"Backend Developer",ready:58,pskills:[{n:"Java",v:62},{n:"Python",v:55},{n:"Backend Dev",v:60}],status:"Moderate"},
+  {id:5,name:"Khizra Batool",ini:"KB",sid:"S24CSC046",email:"batoolkhizra56@gmail.com",phone:"03208240058",gender:"Female",uni:"Salim Habib University",deg:"BSCS",yr:3,sem:5,cgpa:3.31,interests:["AI/ML","Web Development","Data Science","Cybersecurity"],goal:"Job at company",work:"Remote",skills:"SQL, Networking",active:"Networking",role:"Full-Stack Learner",ready:55,pskills:[{n:"SQL",v:60},{n:"Networking",v:52},{n:"Web Dev",v:48}],status:"Moderate"},
+  {id:6,name:"Anum",ini:"AN",sid:"21-33-067",email:"sapphirerose456@gmail.com",phone:"N/A",gender:"Female",uni:"Salim Habib University",deg:"BSCS",yr:3,sem:5,cgpa:3.22,interests:["Web Development"],goal:"Freelancing",work:"Hybrid",skills:"Coding and Web development",active:"Web development",role:"Web Developer",ready:60,pskills:[{n:"Web Development",v:65},{n:"Coding",v:58}],status:"On Track"},
+  {id:7,name:"M. Ghasharab",ini:"MG",sid:"F22BAC018",email:"ghasharabqureshi123@gmail.com",phone:"03122721070",gender:"Male",uni:"Salim Habib University",deg:"BSACF",yr:4,sem:8,cgpa:3.64,interests:["Business"],goal:"Startup",work:"Onsite",skills:"Shopify",active:"Shopify",role:"E-Commerce Specialist",ready:67,pskills:[{n:"Shopify",v:72},{n:"Business Strategy",v:65}],status:"On Track"},
+  {id:8,name:"Sheherbano Shahid",ini:"SS",sid:"44/2021/098",email:"shaherbanoshahid188@gmail.com",phone:"03253483898",gender:"Female",uni:"DUHS",deg:"BSBT",yr:4,sem:8,cgpa:3.55,interests:["Web Development","Mobile Development","Data Science","Cybersecurity"],goal:"Job at company",work:"Hybrid",skills:"Coding, Web development, Graphic designing",active:"Graphic designing, coding",role:"Multi-disciplinary Tech",ready:68,pskills:[{n:"Web Development",v:65},{n:"Graphic Design",v:70},{n:"Coding",v:60}],status:"On Track"},
+  {id:9,name:"Kanza",ini:"KA",sid:"F23CSC041",email:"kanzatariq.shfq@gmail.com",phone:"03104534707",gender:"Female",uni:"Salim Habib University",deg:"BSCS",yr:3,sem:6,cgpa:3.00,interests:["AI/ML"],goal:"Job at company",work:"Onsite",skills:"Research, coding",active:"Research",role:"AI Research Student",ready:53,pskills:[{n:"Research",v:60},{n:"Coding",v:50}],status:"Moderate"},
+  {id:10,name:"Muhammad Rehan Khan",ini:"MR",sid:"F23CSC005",email:"gtavep18@gmail.com",phone:"03420030563",gender:"Male",uni:"Salim Habib University",deg:"CS",yr:3,sem:6,cgpa:4.00,interests:["Cybersecurity"],goal:"Research",work:"Hybrid",skills:"Digital Forensics, Blue teaming, Pentesting",active:"Digital Forensics, Pentesting",role:"Cybersecurity Analyst",ready:80,pskills:[{n:"Digital Forensics",v:78},{n:"Blue Teaming",v:75},{n:"Pentesting",v:70}],status:"Excellent"},
+  {id:11,name:"Habiba Amir Basathia",ini:"HA",sid:"F23CSC024",email:"habibabasathia2004@gmail.com",phone:"03032838883",gender:"Female",uni:"Salim Habib University",deg:"Computer Science",yr:3,sem:6,cgpa:3.66,interests:["AI/ML","Data Science","Cybersecurity","Cloud Computing","DevOps"],goal:"Startup",work:"Remote",skills:"Python, SQL, ML libraries",active:"AWS, Python",role:"Cloud & ML Engineer",ready:72,pskills:[{n:"Python",v:72},{n:"SQL",v:65},{n:"AWS",v:58},{n:"ML Libraries",v:62}],status:"On Track"},
+  {id:12,name:"Burair Haider",ini:"BH",sid:"F21CSC29",email:"haiderburair0@gmail.com",phone:"03069125045",gender:"Male",uni:"Salim Habib University",deg:"Computer Science",yr:4,sem:7,cgpa:2.50,interests:["Web Development","Mobile Development","Cybersecurity"],goal:"Job at company",work:"Hybrid",skills:"Frontend development",active:"Frontend development",role:"Frontend Developer",ready:70,pskills:[{n:"Frontend Dev",v:75},{n:"React.js",v:72},{n:"Tailwind CSS",v:68}],status:"On Track"},
+  {id:13,name:"Muhammad Ebad Ullah Khan",ini:"ME",sid:"26BME024",email:"muhammadebaullah@gmail.com",phone:"03352931885",gender:"Male",uni:"Salim Habib University",deg:"BE Biomedical Engineering",yr:2,sem:3,cgpa:3.30,interests:["Cybersecurity"],goal:"Job at company",work:"Hybrid",skills:"C++, Python, Circuit design, Arduino, Excel, Power BI",active:"Circuit design, Power BI, report writing",role:"Biomedical Tech",ready:50,pskills:[{n:"C++/Python",v:52},{n:"Arduino",v:60},{n:"Power BI",v:58},{n:"Circuit Design",v:65}],status:"Moderate"},
+  {id:14,name:"Munir Khan",ini:"MK",sid:"F23CSC015",email:"munirkhan2k4@gmail.com",phone:"03138815456",gender:"Male",uni:"Salim Habib University",deg:"Computer Science",yr:3,sem:6,cgpa:2.50,interests:["AI/ML","Web Development","Data Science"],goal:"Job at company",work:"Hybrid",skills:"Full stack development, Python, Data Science, AI",active:"AI knowledge",role:"Full-Stack Developer",ready:56,pskills:[{n:"Python",v:58},{n:"Full Stack",v:55},{n:"AI/ML",v:52}],status:"Moderate"},
+  {id:15,name:"Umer",ini:"UM",sid:"F22CSC022",email:"umarn526@gmail.com",phone:"03192884009",gender:"Male",uni:"Salim Habib University",deg:"CS",yr:4,sem:7,cgpa:4.00,interests:["Web Development","Mobile Development"],goal:"Startup",work:"Onsite",skills:"Python, JavaScript",active:"JavaScript",role:"Web & Mobile Dev",ready:74,pskills:[{n:"JavaScript",v:75},{n:"Python",v:65},{n:"Mobile Dev",v:62}],status:"On Track"},
+  {id:16,name:"Hanan Ahmed",ini:"HA2",sid:"S23CSC024",email:"hananmeymon786@gmail.com",phone:"03113772026",gender:"Male",uni:"Salim Habib University",deg:"BSCS",yr:4,sem:7,cgpa:3.48,interests:["AI/ML"],goal:"Job at company",work:"Hybrid",skills:"Python",active:"Python",role:"AI Engineer",ready:65,pskills:[{n:"Python",v:68},{n:"AI/ML",v:60}],status:"On Track"},
+  {id:17,name:"Suresh Kumar",ini:"SK",sid:"S23CSC003",email:"sureshsadhwani829@gmail.com",phone:"03448117829",gender:"Male",uni:"Salim Habib University",deg:"BSCS",yr:4,sem:7,cgpa:2.50,interests:["AI/ML","Mobile Development","Data Science"],goal:"Job at company",work:"Onsite",skills:"Java",active:"Python",role:"Mobile & AI Developer",ready:55,pskills:[{n:"Java",v:62},{n:"Python",v:55},{n:"Mobile Dev",v:50}],status:"Moderate"}
+];
+
+// FYP Modules — each module IS a component of FinalYearPro being built as the FYP
+const FYP_MODULES=[
+  {id:1,title:"ML Career Recommendation Engine",owner:"Azwa Arshad",status:"In Progress",pct:65,priority:"High",
+    what:"Uses student CGPA, skills, interests and goals to recommend personalised career paths, courses, and job roles.",
+    how:"Python backend with scikit-learn. Collaborative filtering + content-based filtering. Served via a REST API to the frontend.",
+    why:"Core AI feature of the FYP — removes guesswork from career planning for students."},
+  {id:2,title:"NestJS REST API & Role-Based Auth",owner:"Waleha Batool",status:"In Progress",pct:72,priority:"High",
+    what:"The entire backend of FinalYearPro — student profiles, mentor notes, internship listings, login system.",
+    how:"Built in NestJS (Node.js). JWT authentication. Three roles: Student, Mentor, Industry. TypeORM + PostgreSQL.",
+    why:"Without this, nothing else in the system can store or retrieve real data."},
+  {id:3,title:"React.js Dashboard (this UI)",owner:"Burair Haider",status:"In Progress",pct:70,priority:"High",
+    what:"The interactive web dashboard you are currently using. All pages, charts, and cards are part of this module.",
+    how:"React 18, custom design system, real student data from intake form. Deployed as a single HTML file for demo.",
+    why:"The evaluator-facing face of FinalYearPro — this is what gets demonstrated in the FYP viva."},
+  {id:4,title:"PostgreSQL Database Schema",owner:"Hanan Ahmed",status:"Completed",pct:100,priority:"High",
+    what:"The full data model — tables for students, skills, goals, internships, mentor notes, industry partners.",
+    how:"Normalised relational schema. TypeORM migrations. Runs on AWS RDS in production.",
+    why:"Completed first so every other module has a stable data foundation to build on."},
+  {id:5,title:"Career Readiness Scoring Engine",owner:"Azwa Arshad",status:"In Progress",pct:55,priority:"Medium",
+    what:"Calculates a 0–100 readiness score per student based on CGPA, skill depth, interests, and activity.",
+    how:"Weighted formula in Python. Scores update as student profiles change. Drives the dashboard ring charts.",
+    why:"The readiness scores you see on every student card are live outputs of this module."},
+  {id:6,title:"Automated Testing Suite",owner:"Taqdees Zahra",status:"Not Started",pct:8,priority:"Medium",
+    what:"Unit tests for all backend API endpoints and end-to-end browser tests for all user flows.",
+    how:"Jest for backend unit tests. Playwright for E2E browser automation across all three user roles.",
+    why:"Required for FYP submission quality assurance and to prevent regressions before the viva."},
+  {id:7,title:"AWS Cloud Deployment",owner:"Hanan Ahmed",status:"Not Started",pct:0,priority:"Low",
+    what:"Moving FinalYearPro from local development onto live AWS infrastructure.",
+    how:"EC2 for the Node.js server, RDS for PostgreSQL, S3 + CloudFront for the React frontend.",
+    why:"Makes the system accessible online rather than only on localhost for evaluators."},
+  {id:8,title:"Student Intake Form Integration",owner:"All Team",status:"Completed",pct:100,priority:"Medium",
+    what:"Pulling real student data from the Google Form into the system.",
+    how:"CSV export from Google Forms → Python cleaning script → seeded into PostgreSQL. 17 real students loaded.",
+    why:"The reason all 17 profiles you see in the dashboards are real — not dummy data."}
+];
+
+const DEADLINES=[
+  {label:"FYP Proposal Submission",date:"Oct 15, 2024",days:-46,done:true},
+  {label:"Midterm Evaluation",date:"Nov 20, 2024",days:-11,done:true},
+  {label:"Prototype Demo",date:"Dec 10, 2024",days:9,done:false},
+  {label:"Testing & QA Complete",date:"Jan 15, 2025",days:45,done:false},
+  {label:"Final Submission",date:"Feb 1, 2025",days:62,done:false},
+  {label:"FYP Viva / Defense",date:"Feb 20, 2025",days:81,done:false}
+];
+
+const JOBS=[
+  {company:"Arbisoft",role:"ML Engineer (Graduate)",match:91,skills:["Python","TensorFlow","FastAPI"],logo:"AS"},
+  {company:"Systems Limited",role:"Software Engineer",match:86,skills:["Python","React","Node.js"],logo:"SL"},
+  {company:"10Pearls",role:"Frontend Engineer",match:88,skills:["React","TypeScript","Next.js"],logo:"10"},
+  {company:"Netsol Technologies",role:"Backend Engineer",match:84,skills:["Node.js","PostgreSQL","Docker"],logo:"NT"},
+  {company:"Teradata Pakistan",role:"Data Analyst",match:79,skills:["Python","SQL","Tableau"],logo:"TD"}
+];
+
+const INTERNSHIPS=[
+  {id:1,company:"Arbisoft",role:"AI/ML Intern",duration:"3 months",location:"Lahore (Hybrid)",stipend:"PKR 25,000/mo",deadline:"Dec 15, 2024",skills:["Python","ML","TensorFlow"],desc:"Work with our ML team on NLP and recommendation systems. Ideal for students with Python and ML fundamentals.",contact:"careers@arbisoft.com",logo:"AS"},
+  {id:2,company:"Systems Limited",role:"Frontend Developer Intern",duration:"3 months",location:"Karachi (Onsite)",stipend:"PKR 20,000/mo",deadline:"Dec 20, 2024",skills:["React.js","TypeScript","CSS"],desc:"Build modern UIs for enterprise clients. React experience required.",contact:"hr@systemslimited.com",logo:"SL"},
+  {id:3,company:"Netsol Technologies",role:"Backend Engineer Intern",duration:"6 months",location:"Lahore (Onsite)",stipend:"PKR 30,000/mo",deadline:"Jan 5, 2025",skills:["Node.js","PostgreSQL","REST APIs"],desc:"Support core fintech backend services. Node.js and database knowledge needed.",contact:"talent@netsoltech.com",logo:"NT"},
+  {id:4,company:"10Pearls",role:"UI/UX & Frontend Intern",duration:"3 months",location:"Karachi (Hybrid)",stipend:"PKR 22,000/mo",deadline:"Jan 10, 2025",skills:["Figma","React","Tailwind CSS"],desc:"Design and implement user interfaces. Figma skills essential.",contact:"jobs@10pearls.com",logo:"10"},
+  {id:5,company:"Teradata Pakistan",role:"Data Analytics Intern",duration:"3 months",location:"Karachi (Hybrid)",stipend:"PKR 18,000/mo",deadline:"Jan 15, 2025",skills:["Python","SQL","Power BI"],desc:"Build dashboards and data pipelines for the BI team. SQL + Python required.",contact:"pakhr@teradata.com",logo:"TD"}
+];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const avgReady=Math.round(STUDENTS.reduce((s,m)=>s+m.ready,0)/STUDENTS.length);
+
+function Pbar({v,max=100,color=T.teal,h=6}){
+  return <div style={{background:"#EEF2F7",borderRadius:99,height:h,overflow:"hidden"}}>
+    <div style={{width:`${Math.min(100,Math.round((v/max)*100))}%`,height:"100%",background:color,borderRadius:99,transition:"width 0.8s cubic-bezier(.4,0,.2,1)"}}/>
+  </div>;
+}
+
+function Chip({label,color}){
+  return <span style={{display:"inline-flex",alignItems:"center",padding:"2px 10px",borderRadius:20,fontSize:11,fontWeight:600,background:color+"18",color}}>{label}</span>;
+}
+
+function Av({ini,size=40,idx=0,extra={}}){
+  const c=AC[idx%AC.length];
+  return <div style={{width:size,height:size,borderRadius:"50%",background:c.b,color:c.t,display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*0.3,fontWeight:700,flexShrink:0,fontFamily:"'Sora',sans-serif",...extra}}>{ini}</div>;
+}
+
+function Ring({score,size=110}){
+  const r=size/2-10,circ=2*Math.PI*r,off=circ-(score/100)*circ;
+  const col=score>=80?T.emerald:score>=65?T.teal:score>=50?T.gold:T.rose;
+  return <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#EEF2F7" strokeWidth={9}/>
+    <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={col} strokeWidth={9}
+      strokeDasharray={circ} strokeDashoffset={off} strokeLinecap="round"
+      transform={`rotate(-90 ${size/2} ${size/2})`} style={{transition:"stroke-dashoffset 1s ease"}}/>
+    <text x={size/2} y={size/2-4} textAnchor="middle" fontSize={size*0.19} fontWeight={800} fill={col} fontFamily="'Sora',sans-serif">{score}</text>
+    <text x={size/2} y={size/2+size*0.13} textAnchor="middle" fontSize={size*0.1} fill={T.muted} fontFamily="'Sora',sans-serif">/100</text>
+  </svg>;
+}
+
+function StatBox({icon,label,val,sub,color=T.teal}){
+  return <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"16px 18px",display:"flex",gap:12,alignItems:"flex-start"}}>
+    <div style={{width:44,height:44,borderRadius:11,background:color+"15",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{icon}</div>
+    <div>
+      <div style={{fontSize:24,fontWeight:800,color,lineHeight:1,fontFamily:"'Sora',sans-serif"}}>{val}</div>
+      <div style={{fontSize:12,fontWeight:600,color:T.text,marginTop:3}}>{label}</div>
+      {sub&&<div style={{fontSize:11,color:T.muted,marginTop:1}}>{sub}</div>}
+    </div>
+  </div>;
+}
+
+function Mark({size=34}){
+  return <svg width={size} height={size} viewBox="0 0 34 34" fill="none">
+    <rect width="34" height="34" rx="9" fill="#0EA5A0"/>
+    <polygon points="17,8 27,13 17,18 7,13" fill="#fff" opacity="0.95"/>
+    <polygon points="7,13 7,19 17,24 17,18" fill="#fff" opacity="0.6"/>
+    <polygon points="27,13 27,19 17,24 17,18" fill="#fff" opacity="0.8"/>
+    <line x1="27" y1="13" x2="27" y2="21" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
+    <circle cx="27" cy="22.5" r="1.5" fill="#fff"/>
+  </svg>;
+}
+
+function Logo(){
+  return <div style={{display:"flex",alignItems:"center",gap:10}}>
+    <Mark size={36}/>
+    <div>
+      <div style={{color:"#fff",fontSize:15,fontWeight:800,letterSpacing:"-0.4px",fontFamily:"'Sora',sans-serif",lineHeight:1}}>FinalYearPro</div>
+      <div style={{color:T.teal,fontSize:9,fontWeight:700,marginTop:3,letterSpacing:"0.12em",textTransform:"uppercase"}}>Smart Career System</div>
+    </div>
+  </div>;
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+function Login({onLogin}){
+  const [role,setRole]=useState("");
+  const [name,setName]=useState("");
+  const [err,setErr]=useState("");
+  const roles=[
+    {id:"student",icon:"🎓",label:"Student",desc:"Career roadmap, recommendations & mock interviews"},
+    {id:"mentor",icon:"👨‍🏫",label:"Mentor",desc:"Monitor student progress and send action notes"},
+    {id:"industry",icon:"🏢",label:"Industry Partner",desc:"Post internships and scout student talent"}
+  ];
+  const go=()=>{
+    if(!role){setErr("Please select your role first.");return;}
+    if(!name.trim()){setErr("Please enter your name.");return;}
+    onLogin({role,name:name.trim()});
+  };
+  const rc={student:T.teal,mentor:T.violet,industry:T.emerald};
+  return <div style={{minHeight:"100vh",background:`linear-gradient(135deg,${T.ink} 0%,#0A2540 55%,#0D1117 100%)`,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+    <div style={{width:"100%",maxWidth:440,animation:"fadeIn 0.4s ease"}}>
+      <div style={{textAlign:"center",marginBottom:32}}>
+        <div style={{display:"inline-flex",alignItems:"center",gap:14,marginBottom:10}}>
+          <Mark size={50}/>
+          <div style={{textAlign:"left"}}>
+            <div style={{color:"#fff",fontSize:28,fontWeight:800,letterSpacing:"-0.5px",fontFamily:"'Sora',sans-serif",lineHeight:1}}>FinalYearPro</div>
+            <div style={{color:T.teal,fontSize:10,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",marginTop:5}}>Smart Career System · SBU FYP 2025</div>
+          </div>
+        </div>
+        <div style={{color:"#4B5563",fontSize:13,marginTop:8}}>Sign in to access your dashboard</div>
+      </div>
+
+      <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:20,padding:"28px 30px"}}>
+        <div style={{marginBottom:22}}>
+          <div style={{color:"#6B7280",fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:10}}>I am a</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {roles.map(r=>{
+              const sel=role===r.id;
+              return <div key={r.id} onClick={()=>{setRole(r.id);setErr("");}} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 15px",borderRadius:11,cursor:"pointer",background:sel?rc[r.id]+"18":"rgba(255,255,255,0.025)",border:`1.5px solid ${sel?rc[r.id]+"70":"rgba(255,255,255,0.05)"}`,transition:"all 0.15s"}}>
+                <span style={{fontSize:20}}>{r.icon}</span>
+                <div style={{flex:1}}>
+                  <div style={{color:sel?rc[r.id]:"#CBD5E1",fontWeight:600,fontSize:13}}>{r.label}</div>
+                  <div style={{color:"#4B5563",fontSize:11,marginTop:1}}>{r.desc}</div>
+                </div>
+                <div style={{width:16,height:16,borderRadius:"50%",border:`2px solid ${sel?rc[r.id]:"#374151"}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  {sel&&<div style={{width:7,height:7,borderRadius:"50%",background:rc[r.id]}}/>}
+                </div>
+              </div>;
+            })}
+          </div>
+        </div>
+
+        <div style={{marginBottom:20}}>
+          <div style={{color:"#6B7280",fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8}}>Your Name</div>
+          <input value={name} onChange={e=>{setName(e.target.value);setErr("");}} onKeyDown={e=>e.key==="Enter"&&go()} placeholder={role==="student"?"e.g. Azwa Arshad":role==="mentor"?"e.g. Dr. Zubair Ahmed":role==="industry"?"e.g. Arbisoft HR Team":"Enter your name"} style={{width:"100%",padding:"12px 15px",background:"rgba(255,255,255,0.05)",border:`1.5px solid ${err?"#F43F5E50":"rgba(255,255,255,0.09)"}`,borderRadius:10,color:"#fff",fontSize:13,outline:"none"}}/>
+          {err&&<div style={{color:T.rose,fontSize:11,marginTop:6}}>{err}</div>}
+        </div>
+
+        <button onClick={go} style={{width:"100%",padding:"13px",borderRadius:11,border:"none",background:`linear-gradient(135deg,${T.teal},${T.tealD})`,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:`0 4px 18px ${T.teal}40`}}>
+          Enter Dashboard →
+        </button>
+        <div style={{color:"#1F2937",fontSize:11,textAlign:"center",marginTop:14}}>BS Computer Science FYP · Salim Habib University · 2024–25</div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+function Dashboard(){
+  const gc=STUDENTS.reduce((a,s)=>{a[s.goal]=(a[s.goal]||0)+1;return a;},{});
+  const ic={};STUDENTS.forEach(s=>s.interests.forEach(i=>{ic[i]=(ic[i]||0)+1;}));
+  const top5=Object.entries(ic).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  return <div>
+    <div style={{background:`linear-gradient(135deg,${T.ink},${T.inkL} 60%,#0A2540)`,borderRadius:18,padding:"26px 30px",marginBottom:20,display:"flex",alignItems:"center",gap:26}}>
+      <div style={{flex:1}}>
+        <div style={{color:T.teal,fontSize:11,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:8}}>FinalYearPro · Cohort 2025–26</div>
+        <div style={{color:"#fff",fontSize:24,fontWeight:800,lineHeight:1.25,fontFamily:"'Sora',sans-serif"}}>Smart Career Roadmap<br/><span style={{color:T.tealL}}>&amp; Industry Liaison System</span></div>
+        <div style={{color:"#64748B",fontSize:13,marginTop:8}}>Live data from student intake · {STUDENTS.length} students registered</div>
+        <div style={{display:"flex",gap:5,marginTop:12,flexWrap:"wrap"}}>
+          {STUDENTS.slice(0,12).map((m,i)=><Av key={m.id} ini={m.ini} size={30} idx={i} extra={{border:"2px solid #1F2937"}}/>)}
+          {STUDENTS.length>12&&<div style={{width:30,height:30,borderRadius:"50%",background:T.inkLL,color:"#6B7280",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700}}>+{STUDENTS.length-12}</div>}
+        </div>
+      </div>
+      <div style={{textAlign:"center"}}><Ring score={avgReady} size={120}/><div style={{color:"#6B7280",fontSize:11,marginTop:3}}>Avg Readiness</div></div>
+    </div>
+
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:20}}>
+      <StatBox icon="👥" label="Registered Students" val={STUDENTS.length} sub="All programmes · Live data" color={T.teal}/>
+      <StatBox icon="🎯" label="Seeking Employment" val={STUDENTS.filter(s=>s.goal==="Job at company").length} sub="Job at company goal" color={T.emerald}/>
+      <StatBox icon="🚀" label="Startup Minded" val={STUDENTS.filter(s=>s.goal==="Startup").length} sub="Entrepreneurship path" color={T.violet}/>
+      <StatBox icon="📊" label="Avg CGPA" val={(STUDENTS.reduce((s,m)=>s+m.cgpa,0)/STUDENTS.length).toFixed(2)} sub="Across all students" color={T.gold}/>
+    </div>
+
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"18px 22px"}}>
+        <div style={{fontSize:14,fontWeight:700,marginBottom:16,fontFamily:"'Sora',sans-serif"}}>Student Readiness</div>
+        {STUDENTS.map((m,i)=><div key={m.id} style={{display:"flex",alignItems:"center",gap:10,marginBottom:9}}>
+          <Av ini={m.ini} size={26} idx={i}/>
+          <div style={{flex:1}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+              <span style={{fontSize:11.5,fontWeight:600}}>{m.name.split(" ").slice(0,2).join(" ")}</span>
+              <span style={{fontSize:11.5,fontWeight:700,color:m.ready>=80?T.emerald:m.ready>=65?T.teal:T.gold}}>{m.ready}%</span>
+            </div>
+            <Pbar v={m.ready} color={m.ready>=80?T.emerald:m.ready>=65?T.teal:T.gold} h={4}/>
+          </div>
+        </div>)}
+      </div>
+
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"18px 22px"}}>
+          <div style={{fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:14}}>🔥 Top Interest Areas</div>
+          {top5.map(([area,count],i)=><div key={area} style={{marginBottom:10}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+              <span style={{fontSize:12,fontWeight:600}}>{area}</span>
+              <span style={{fontSize:12,fontWeight:700,color:T.teal}}>{count} students</span>
+            </div>
+            <Pbar v={count} max={STUDENTS.length} color={[T.teal,T.violet,T.emerald,T.gold,T.rose][i]} h={6}/>
+          </div>)}
+        </div>
+
+        <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"18px 22px"}}>
+          <div style={{fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:14}}>📊 Goals &amp; Work Preference</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12}}>
+            {Object.entries(gc).map(([g,c],i)=><div key={g} style={{padding:"10px 12px",background:[T.teal,T.violet,T.emerald,T.gold][i%4]+"10",borderRadius:8}}>
+              <div style={{fontSize:18,fontWeight:800,color:[T.teal,T.violet,T.emerald,T.gold][i%4],fontFamily:"'Sora',sans-serif"}}>{c}</div>
+              <div style={{fontSize:11,color:T.muted,marginTop:2}}>{g}</div>
+            </div>)}
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            {["Onsite","Remote","Hybrid"].map(w=><div key={w} style={{flex:1,padding:"8px",background:T.bg,borderRadius:8,textAlign:"center"}}>
+              <div style={{fontSize:16,fontWeight:700,fontFamily:"'Sora',sans-serif"}}>{STUDENTS.filter(s=>s.work===w).length}</div>
+              <div style={{fontSize:10,color:T.muted}}>{w}</div>
+            </div>)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Roster ────────────────────────────────────────────────────────────────────
+function Roster(){
+  const [sel,setSel]=useState(STUDENTS[0]);
+  const [q,setQ]=useState("");
+  const filtered=STUDENTS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.deg.toLowerCase().includes(q.toLowerCase())||s.interests.join(" ").toLowerCase().includes(q.toLowerCase()));
+  return <div style={{display:"grid",gridTemplateColumns:"290px 1fr",gap:16}}>
+    <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:12,maxHeight:"85vh",display:"flex",flexDirection:"column"}}>
+      <div style={{fontSize:13,fontWeight:700,padding:"4px 6px 10px",fontFamily:"'Sora',sans-serif",borderBottom:`1px solid ${T.border}`,marginBottom:8}}>All Students ({STUDENTS.length})</div>
+      <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search name, degree, interest…" style={{padding:"8px 11px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:12,outline:"none",marginBottom:8}}/>
+      <div style={{overflowY:"auto",flex:1}}>
+        {filtered.map((m,i)=><div key={m.id} onClick={()=>setSel(m)} style={{display:"flex",alignItems:"center",gap:9,padding:"9px",borderRadius:9,cursor:"pointer",background:sel.id===m.id?T.teal+"14":"transparent",border:sel.id===m.id?`1px solid ${T.teal}30`:"1px solid transparent",marginBottom:3,transition:"all 0.12s"}}>
+          <Av ini={m.ini} size={32} idx={i}/>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:12.5,fontWeight:600,color:sel.id===m.id?T.teal:T.text,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.name}</div>
+            <div style={{fontSize:10.5,color:T.muted}}>{m.deg} · Sem {m.sem}</div>
+          </div>
+          <div style={{fontSize:11,fontWeight:700,color:m.ready>=75?T.emerald:m.ready>=60?T.teal:T.gold}}>{m.ready}%</div>
+        </div>)}
+      </div>
+    </div>
+
+    <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"22px 26px"}}>
+      <div style={{display:"flex",alignItems:"flex-start",gap:16,marginBottom:18}}>
+        <Av ini={sel.ini} size={60} idx={STUDENTS.findIndex(m=>m.id===sel.id)}/>
+        <div style={{flex:1}}>
+          <div style={{fontSize:19,fontWeight:800,fontFamily:"'Sora',sans-serif"}}>{sel.name}</div>
+          <div style={{fontSize:12,color:T.muted,marginTop:3}}>{sel.role} · {sel.deg} · {sel.uni}</div>
+          <div style={{fontSize:12,color:T.muted}}>Year {sel.yr} · Sem {sel.sem} · CGPA <strong style={{color:sel.cgpa>=3.5?T.emerald:sel.cgpa>=3.0?T.teal:T.gold}}>{sel.cgpa.toFixed(2)}</strong></div>
+          <div style={{display:"flex",gap:5,marginTop:8,flexWrap:"wrap"}}>
+            {sel.interests.map(t=><span key={t} style={{background:T.teal+"15",color:T.teal,padding:"3px 9px",borderRadius:6,fontSize:11,fontWeight:500}}>{t}</span>)}
+            <span style={{background:T.violet+"15",color:T.violet,padding:"3px 9px",borderRadius:6,fontSize:11,fontWeight:500}}>Goal: {sel.goal}</span>
+            <span style={{background:T.sky+"20",color:"#0369a1",padding:"3px 9px",borderRadius:6,fontSize:11,fontWeight:500}}>{sel.work}</span>
+          </div>
+        </div>
+        <div style={{textAlign:"center"}}><Ring score={sel.ready} size={80}/><Chip label={sel.status} color={sel.status==="Excellent"?T.emerald:sel.status==="On Track"?T.teal:T.gold}/></div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <div>
+          <div style={{fontSize:13,fontWeight:700,marginBottom:10,fontFamily:"'Sora',sans-serif"}}>Skills</div>
+          {sel.pskills.map(s=><div key={s.n} style={{marginBottom:9}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12}}>{s.n}</span><span style={{fontSize:12,fontWeight:700,color:s.v>=70?T.emerald:s.v>=55?T.teal:T.gold}}>{s.v}%</span></div>
+            <Pbar v={s.v} color={s.v>=70?T.emerald:s.v>=55?T.teal:T.gold} h={5}/>
+          </div>)}
+        </div>
+        <div>
+          <div style={{fontSize:13,fontWeight:700,marginBottom:10,fontFamily:"'Sora',sans-serif"}}>Profile</div>
+          {[{l:"Student ID",v:sel.sid},{l:"Email",v:sel.email},{l:"Phone",v:sel.phone},{l:"Gender",v:sel.gender},{l:"Work Type",v:sel.work}].map(d=><div key={d.l} style={{display:"flex",gap:10,padding:"6px 0",borderBottom:`1px solid ${T.border}`}}>
+            <span style={{fontSize:11,color:T.muted,minWidth:85}}>{d.l}</span>
+            <span style={{fontSize:11,fontWeight:500,color:T.text,wordBreak:"break-all"}}>{d.v}</span>
+          </div>)}
+          <div style={{marginTop:12}}>
+            <div style={{fontSize:12,fontWeight:600,marginBottom:4}}>Currently active in</div>
+            <div style={{fontSize:12,color:T.muted,lineHeight:1.6}}>{sel.active}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── FYP Tracker ───────────────────────────────────────────────────────────────
+// Clearly explains what FinalYearPro IS and what each module does
+function FYPTracker(){
+  const [exp,setExp]=useState(null);
+  const total=Math.round(FYP_MODULES.reduce((s,m)=>s+m.pct,0)/FYP_MODULES.length);
+  const sc={"Completed":T.emerald,"In Progress":T.teal,"Not Started":T.rose};
+  const pc={"High":T.rose,"Medium":T.gold,"Low":T.teal};
+
+  return <div>
+    {/* What is this FYP */}
+    <div style={{background:`linear-gradient(135deg,${T.inkL},${T.ink})`,borderRadius:16,padding:"22px 26px",marginBottom:18}}>
+      <div style={{display:"flex",gap:24,alignItems:"flex-start"}}>
+        <div style={{flex:1}}>
+          <div style={{color:T.teal,fontSize:11,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:8}}>Final Year Project — BS Computer Science · SBU 2024–25</div>
+          <div style={{color:"#fff",fontSize:20,fontWeight:800,fontFamily:"'Sora',sans-serif",lineHeight:1.3,marginBottom:10}}>FinalYearPro: Smart Career Roadmap &amp; Industry Liaison System</div>
+          <div style={{color:"#94A3B8",fontSize:13,lineHeight:1.7,maxWidth:580}}>
+            An AI-powered web platform that solves a real problem: <span style={{color:"#CBD5E1"}}>final year students don't know what career path to take or how to get industry-ready.</span> FinalYearPro uses machine learning to analyse each student's skills, CGPA, and interests — then delivers personalised career recommendations, tracks FYP progress, connects students with industry internships, and simulates real job interviews. <span style={{color:T.tealL}}>This dashboard is the live working prototype.</span>
+          </div>
+          <div style={{display:"flex",gap:6,marginTop:12,flexWrap:"wrap"}}>
+            {["React.js","NestJS","PostgreSQL","Python ML","AWS"].map(t=><span key={t} style={{background:T.teal+"20",color:T.tealL,padding:"3px 10px",borderRadius:6,fontSize:11,fontWeight:500}}>{t}</span>)}
+          </div>
+        </div>
+        <div style={{minWidth:170}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+            <span style={{color:"#94A3B8",fontSize:13}}>Overall Progress</span>
+            <span style={{color:T.tealL,fontSize:13,fontWeight:700}}>{total}%</span>
+          </div>
+          <div style={{background:"#0A1628",borderRadius:99,height:9,overflow:"hidden",marginBottom:14}}>
+            <div style={{width:`${total}%`,height:"100%",background:`linear-gradient(90deg,${T.teal},${T.emerald})`,borderRadius:99,transition:"width 1s ease"}}/>
+          </div>
+          {[["Completed",T.emerald,FYP_MODULES.filter(m=>m.status==="Completed").length],
+            ["In Progress",T.teal,FYP_MODULES.filter(m=>m.status==="In Progress").length],
+            ["Not Started",T.rose,FYP_MODULES.filter(m=>m.status==="Not Started").length]].map(([s,c,n])=><div key={s} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <div style={{width:8,height:8,borderRadius:"50%",background:c,flexShrink:0}}/>
+            <span style={{color:"#94A3B8",fontSize:12,flex:1}}>{s}</span>
+            <span style={{color:"#fff",fontSize:14,fontWeight:700}}>{n}</span>
+          </div>)}
+        </div>
+      </div>
+    </div>
+
+    {/* Module table with expandable what/how/why */}
+    <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,overflow:"hidden",marginBottom:16}}>
+      <div style={{padding:"14px 22px",borderBottom:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <div style={{fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif"}}>Module Breakdown</div>
+          <div style={{fontSize:12,color:T.muted,marginTop:2}}>↓ Click any module to understand what it does</div>
+        </div>
+        <Chip label="Sprint 3 Active" color={T.teal}/>
+      </div>
+
+      {/* Table header */}
+      <div style={{display:"grid",gridTemplateColumns:"2fr 1.2fr 1.6fr 0.7fr 0.9fr",background:T.bg,padding:"9px 22px",gap:8}}>
+        {["Module","Owner","Progress","Priority","Status"].map(h=><div key={h} style={{fontSize:11,fontWeight:600,color:T.muted,textTransform:"uppercase",letterSpacing:"0.06em"}}>{h}</div>)}
+      </div>
+
+      {FYP_MODULES.map(m=>{
+        const open=exp===m.id;
+        return <div key={m.id}>
+          <div onClick={()=>setExp(open?null:m.id)} style={{display:"grid",gridTemplateColumns:"2fr 1.2fr 1.6fr 0.7fr 0.9fr",padding:"13px 22px",gap:8,alignItems:"center",borderTop:`1px solid ${T.border}`,cursor:"pointer",background:open?T.bg:"transparent",transition:"background 0.1s"}}>
+            <div style={{fontSize:13,fontWeight:600,display:"flex",alignItems:"center",gap:8}}>
+              <span style={{color:T.muted,fontSize:11}}>{open?"▲":"▼"}</span>{m.title}
+            </div>
+            <div style={{fontSize:12,color:T.muted}}>{m.owner}</div>
+            <div style={{display:"flex",alignItems:"center",gap:7}}>
+              <div style={{flex:1}}><Pbar v={m.pct} color={sc[m.status]} h={6}/></div>
+              <span style={{fontSize:12,fontWeight:600,color:sc[m.status],minWidth:30}}>{m.pct}%</span>
+            </div>
+            <Chip label={m.priority} color={pc[m.priority]}/>
+            <Chip label={m.status} color={sc[m.status]}/>
+          </div>
+          {open&&<div style={{padding:"14px 22px 18px 44px",background:T.bg,borderTop:`1px solid ${T.border}`,animation:"fadeIn 0.2s ease"}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16}}>
+              {[{head:"🎯 What it does",body:m.what},{head:"⚙️ How it's built",body:m.how},{head:"💡 Why it matters",body:m.why}].map(c=><div key={c.head} style={{background:T.card,borderRadius:10,padding:"12px 14px",border:`1px solid ${T.border}`}}>
+                <div style={{fontSize:12,fontWeight:700,marginBottom:6,color:T.text}}>{c.head}</div>
+                <div style={{fontSize:12,color:T.muted,lineHeight:1.65}}>{c.body}</div>
+              </div>)}
+            </div>
+          </div>}
+        </div>;
+      })}
+    </div>
+
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"18px 22px"}}>
+        <div style={{fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:14}}>📅 FYP Schedule</div>
+        {DEADLINES.map((d,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:i<DEADLINES.length-1?`1px solid ${T.border}`:"none"}}>
+          <div style={{width:22,height:22,borderRadius:"50%",background:d.done?T.emerald:d.days<=15?T.rose:T.light,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:d.done||d.days<=15?"#fff":T.muted,flexShrink:0}}>{d.done?"✓":"!"}</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:12,fontWeight:600,textDecoration:d.done?"line-through":"none",color:d.done?T.muted:T.text}}>{d.label}</div>
+            <div style={{fontSize:11,color:T.muted}}>{d.date}</div>
+          </div>
+          {!d.done&&<span style={{fontSize:11,fontWeight:600,color:d.days<=15?T.rose:T.muted}}>{d.days}d</span>}
+        </div>)}
+      </div>
+
+      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"18px 22px"}}>
+        <div style={{fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:14}}>🛠️ Tech Stack</div>
+        {[{layer:"Frontend",tech:"React.js, custom design system",c:T.sky},{layer:"Backend",tech:"NestJS (Node.js), JWT Auth",c:T.teal},{layer:"Database",tech:"PostgreSQL, TypeORM migrations",c:T.violet},{layer:"ML Engine",tech:"Python, scikit-learn, pandas",c:T.gold},{layer:"Cloud",tech:"AWS EC2, RDS, S3, CloudFront",c:T.emerald},{layer:"Testing",tech:"Jest (unit) + Playwright (E2E)",c:T.rose}].map(s=><div key={s.layer} style={{display:"flex",gap:10,padding:"7px 0",borderBottom:`1px solid ${T.border}`,alignItems:"center"}}>
+          <div style={{width:9,height:9,borderRadius:"50%",background:s.c,flexShrink:0}}/>
+          <span style={{fontSize:12,fontWeight:600,minWidth:85}}>{s.layer}</span>
+          <span style={{fontSize:12,color:T.muted}}>{s.tech}</span>
+        </div>)}
+        <div style={{marginTop:12,padding:"10px 13px",background:T.teal+"08",borderRadius:8,border:`1px solid ${T.teal}20`}}>
+          <div style={{fontSize:12,color:T.teal,fontWeight:600}}>📌 This dashboard is the FYP prototype</div>
+          <div style={{fontSize:11.5,color:T.muted,marginTop:3,lineHeight:1.5}}>The 3-role login, real student data, AI interview, mentor &amp; industry views — all live features of the FYP being evaluated right now.</div>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Recommendations ───────────────────────────────────────────────────────────
+function Recommendations(){
+  const [active,setActive]=useState(STUDENTS[0]);
+  const recs=s=>{
+    const r=[];
+    if(s.interests.includes("AI/ML"))r.push({type:"Course",title:"ML Specialization",platform:"Coursera",pri:"High",tag:"AI/ML"});
+    if(s.interests.includes("Web Development"))r.push({type:"Course",title:"React / Next.js Masterclass",platform:"Udemy",pri:"High",tag:"Web"});
+    if(s.interests.includes("Data Science"))r.push({type:"Cert",title:"Google Data Analytics",platform:"Coursera",pri:"Medium",tag:"Data"});
+    if(s.interests.includes("Cybersecurity"))r.push({type:"Cert",title:"CompTIA Security+",platform:"CompTIA",pri:"High",tag:"Security"});
+    if(s.interests.includes("Cloud Computing"))r.push({type:"Cert",title:"AWS Cloud Practitioner",platform:"Amazon",pri:"Medium",tag:"Cloud"});
+    if(s.interests.includes("Mobile Development"))r.push({type:"Course",title:"Flutter & Dart Bootcamp",platform:"Udemy",pri:"Medium",tag:"Mobile"});
+    if(s.goal==="Startup")r.push({type:"Project",title:"Build & launch a side product",platform:"Self-directed",pri:"High",tag:"Startup"});
+    if(s.goal==="Freelancing")r.push({type:"Project",title:"Create Upwork profile & first gig",platform:"Upwork",pri:"High",tag:"Freelance"});
+    if(s.cgpa<3.0)r.push({type:"Skill",title:"Strengthen core CS fundamentals",platform:"Self-study",pri:"High",tag:"Academic"});
+    r.push({type:"Project",title:`Portfolio project in ${s.interests[0]||"your field"}`,platform:"GitHub",pri:"Medium",tag:"Portfolio"});
+    return r.slice(0,4);
+  };
+  return <div>
+    <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"18px 22px",marginBottom:18}}>
+      <div style={{fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:12}}>🤖 AI Recommendations — Select Student</div>
+      <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+        {STUDENTS.map((m,i)=><div key={m.id} onClick={()=>setActive(m)} style={{display:"flex",alignItems:"center",gap:7,padding:"6px 11px",borderRadius:9,cursor:"pointer",background:active.id===m.id?T.teal:T.bg,border:`1px solid ${active.id===m.id?T.teal:T.border}`,transition:"all 0.12s"}}>
+          <Av ini={m.ini} size={22} idx={i}/>
+          <span style={{fontSize:11,fontWeight:600,color:active.id===m.id?"#fff":T.text}}>{m.name.split(" ")[0]}</span>
+        </div>)}
+      </div>
+    </div>
+    <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"12px 22px",marginBottom:14,display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+      <span style={{fontSize:12,fontWeight:600,color:T.muted}}>AI signals for {active.name.split(" ")[0]}:</span>
+      {[`Interest: ${active.interests[0]}`,`Goal: ${active.goal}`,`CGPA: ${active.cgpa}`,`Work: ${active.work}`].map(t=><span key={t} style={{background:T.violet+"15",color:T.violet,padding:"3px 9px",borderRadius:6,fontSize:11,fontWeight:500}}>{t}</span>)}
+    </div>
+    {recs(active).map((r,i)=><div key={i} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:"14px 18px",display:"flex",alignItems:"center",gap:14,marginBottom:10}}>
+      <div style={{width:44,height:44,borderRadius:11,background:T.teal+"15",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>
+        {r.type==="Course"?"📘":r.type==="Project"?"🏗️":r.type==="Cert"?"🏅":"⚡"}
+      </div>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:600}}>{r.title}</div>
+        <div style={{fontSize:12,color:T.muted,marginTop:2}}>{r.type} · {r.platform}</div>
+      </div>
+      <Chip label={r.tag} color={T.teal}/>
+      <Chip label={r.pri} color={r.pri==="High"?T.rose:r.pri==="Medium"?T.gold:T.muted}/>
+      <button style={{padding:"7px 15px",borderRadius:8,border:"none",background:T.teal,color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer"}}>Start →</button>
+    </div>)}
+  </div>;
+}
+
+// ── Mentor Dashboard ──────────────────────────────────────────────────────────
+function MentorDashboard(){
+  const [sel,setSel]=useState(STUDENTS[0]);
+  const [q,setQ]=useState("");
+  const [fy,setFy]=useState("all");
+  const [fs,setFs]=useState("all");
+  const years=[...new Set(STUDENTS.map(s=>s.yr))].sort();
+  const filt=STUDENTS.filter(s=>(fy==="all"||s.yr===parseInt(fy))&&(fs==="all"||s.status===fs)&&(s.name.toLowerCase().includes(q.toLowerCase())||s.deg.toLowerCase().includes(q.toLowerCase())));
+  const sc2={Excellent:0,"On Track":0,Moderate:0};STUDENTS.forEach(s=>{if(sc2[s.status]!==undefined)sc2[s.status]++;});
+  return <div>
+    <div style={{background:`linear-gradient(135deg,#1a1060,#0f2b5c)`,borderRadius:16,padding:"22px 26px",marginBottom:18,display:"flex",alignItems:"center",gap:22}}>
+      <div style={{flex:1}}>
+        <div style={{color:T.violet,fontSize:11,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:6}}>Mentor Control Center</div>
+        <div style={{color:"#fff",fontSize:20,fontWeight:800,fontFamily:"'Sora',sans-serif"}}>Student Overview</div>
+        <div style={{color:"#94A3B8",fontSize:13,marginTop:5}}>Complete profiles · Academic tracking · Career readiness</div>
+        <div style={{display:"flex",gap:8,marginTop:12}}>
+          {Object.entries(sc2).map(([st,ct])=><div key={st} style={{padding:"7px 14px",borderRadius:8,background:"rgba(255,255,255,0.08)",display:"flex",gap:7,alignItems:"center"}}>
+            <div style={{width:7,height:7,borderRadius:"50%",background:st==="Excellent"?T.emerald:st==="On Track"?T.teal:T.gold}}/>
+            <span style={{fontSize:12,color:"#CBD5E1"}}>{ct} {st}</span>
+          </div>)}
+        </div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+        {[{l:"Total",v:STUDENTS.length,c:T.tealL},{l:"Avg CGPA",v:(STUDENTS.reduce((s,m)=>s+m.cgpa,0)/STUDENTS.length).toFixed(2),c:T.gold},{l:"Avg Ready",v:`${avgReady}%`,c:T.violet},{l:"Sem 7",v:STUDENTS.filter(s=>s.sem===7).length,c:T.emerald}].map(s=><div key={s.l} style={{padding:"11px 14px",background:"rgba(255,255,255,0.07)",borderRadius:9,textAlign:"center"}}>
+          <div style={{fontSize:20,fontWeight:800,color:s.c,fontFamily:"'Sora',sans-serif"}}>{s.v}</div>
+          <div style={{fontSize:10,color:"#94A3B8",marginTop:2}}>{s.l}</div>
+        </div>)}
+      </div>
+    </div>
+
+    <div style={{display:"grid",gridTemplateColumns:"300px 1fr",gap:16}}>
+      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:12,maxHeight:"72vh",display:"flex",flexDirection:"column"}}>
+        <div style={{fontSize:13,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:10}}>Student List ({filt.length})</div>
+        <div style={{display:"flex",gap:7,marginBottom:8}}>
+          <select value={fy} onChange={e=>setFy(e.target.value)} style={{flex:1,padding:"6px 7px",borderRadius:7,border:`1px solid ${T.border}`,fontSize:11,outline:"none",background:T.bg}}>
+            <option value="all">All Years</option>{years.map(y=><option key={y} value={y}>Year {y}</option>)}
+          </select>
+          <select value={fs} onChange={e=>setFs(e.target.value)} style={{flex:1,padding:"6px 7px",borderRadius:7,border:`1px solid ${T.border}`,fontSize:11,outline:"none",background:T.bg}}>
+            <option value="all">All Status</option><option>Excellent</option><option>On Track</option><option>Moderate</option>
+          </select>
+        </div>
+        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search…" style={{padding:"7px 11px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:12,outline:"none",marginBottom:8}}/>
+        <div style={{overflowY:"auto",flex:1}}>
+          {filt.map((s,i)=><div key={s.id} onClick={()=>setSel(s)} style={{display:"flex",alignItems:"center",gap:9,padding:"9px 7px",borderRadius:9,cursor:"pointer",background:sel.id===s.id?T.violet+"12":"transparent",border:sel.id===s.id?`1px solid ${T.violet}35`:"1px solid transparent",marginBottom:3,transition:"all 0.1s"}}>
+            <Av ini={s.ini} size={32} idx={i}/>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:12.5,fontWeight:600,color:sel.id===s.id?T.violet:T.text,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</div>
+              <div style={{fontSize:10.5,color:T.muted}}>{s.sid} · Yr {s.yr} Sem {s.sem}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:12,fontWeight:700,color:s.cgpa>=3.5?T.emerald:s.cgpa>=3.0?T.teal:T.gold}}>{s.cgpa.toFixed(2)}</div>
+              <div style={{fontSize:9,color:T.muted}}>CGPA</div>
+            </div>
+          </div>)}
+        </div>
+      </div>
+
+      <div>
+        <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"20px 24px",marginBottom:14}}>
+          <div style={{display:"flex",alignItems:"flex-start",gap:14,marginBottom:16}}>
+            <Av ini={sel.ini} size={56} idx={STUDENTS.findIndex(s=>s.id===sel.id)}/>
+            <div style={{flex:1}}>
+              <div style={{display:"flex",alignItems:"center",gap:9}}>
+                <div style={{fontSize:18,fontWeight:800,fontFamily:"'Sora',sans-serif"}}>{sel.name}</div>
+                <Chip label={sel.status} color={sel.status==="Excellent"?T.emerald:sel.status==="On Track"?T.teal:T.gold}/>
+              </div>
+              <div style={{fontSize:12,color:T.muted,marginTop:3}}>{sel.role} · {sel.deg} · {sel.uni}</div>
+              <div style={{fontSize:12,color:T.muted}}>Year {sel.yr} · Sem {sel.sem} · ID: {sel.sid}</div>
+            </div>
+            <Ring score={sel.ready} size={76}/>
+          </div>
+          <div style={{background:T.bg,borderRadius:9,padding:"12px 14px",marginBottom:14}}>
+            <div style={{fontSize:12,fontWeight:700,color:T.violet,marginBottom:8}}>🔒 Confidential — Mentor Only</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5}}>
+              {[{l:"Email",v:sel.email},{l:"Mobile",v:sel.phone},{l:"Gender",v:sel.gender},{l:"CGPA",v:sel.cgpa.toFixed(2)},{l:"Goal",v:sel.goal},{l:"Work Pref",v:sel.work}].map(d=><div key={d.l} style={{display:"flex",gap:8,padding:"4px 0"}}>
+                <span style={{fontSize:11,color:T.muted,minWidth:95}}>{d.l}</span>
+                <span style={{fontSize:11,fontWeight:600}}>{d.v}</span>
+              </div>)}
+            </div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+            <div>
+              <div style={{fontSize:12.5,fontWeight:700,marginBottom:10,fontFamily:"'Sora',sans-serif"}}>Skills Assessment</div>
+              {sel.pskills.map(s=><div key={s.n} style={{marginBottom:8}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12}}>{s.n}</span><span style={{fontSize:12,fontWeight:700,color:s.v>=70?T.emerald:s.v>=55?T.teal:T.gold}}>{s.v}%</span></div>
+                <Pbar v={s.v} color={s.v>=70?T.emerald:s.v>=55?T.teal:T.gold} h={5}/>
+              </div>)}
+            </div>
+            <div>
+              <div style={{fontSize:12.5,fontWeight:700,marginBottom:8,fontFamily:"'Sora',sans-serif"}}>Interest Areas</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:12}}>{sel.interests.map(t=><span key={t} style={{background:T.teal+"15",color:T.teal,padding:"3px 9px",borderRadius:6,fontSize:11,fontWeight:500}}>{t}</span>)}</div>
+              <div style={{fontSize:12,fontWeight:600,marginBottom:5}}>Declared skills</div>
+              <div style={{fontSize:11.5,color:T.muted,background:T.bg,padding:"9px 11px",borderRadius:7,lineHeight:1.6,marginBottom:10}}>{sel.skills}</div>
+              <div style={{fontSize:12,fontWeight:600,marginBottom:5}}>Currently active in</div>
+              <div style={{fontSize:11.5,color:T.muted,background:T.emerald+"08",padding:"9px 11px",borderRadius:7,border:`1px solid ${T.emerald}20`,lineHeight:1.6}}>{sel.active}</div>
+            </div>
+          </div>
+        </div>
+        <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"16px 22px"}}>
+          <div style={{fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:10}}>📝 Action Items</div>
+          <div style={{display:"flex",flexDirection:"column",gap:7}}>
+            {sel.cgpa<3.0&&<div style={{display:"flex",gap:8,padding:"9px 13px",background:T.rose+"0C",borderLeft:`3px solid ${T.rose}`,borderRadius:"0 7px 7px 0",fontSize:12}}><span>🚨</span><span>CGPA below 3.0 — schedule academic review session</span></div>}
+            {sel.ready<60&&<div style={{display:"flex",gap:8,padding:"9px 13px",background:T.gold+"0C",borderLeft:`3px solid ${T.gold}`,borderRadius:"0 7px 7px 0",fontSize:12}}><span>⚠️</span><span>Readiness below 60% — recommend skill workshops and portfolio projects</span></div>}
+            {sel.goal==="Startup"&&<div style={{display:"flex",gap:8,padding:"9px 13px",background:T.violet+"0C",borderLeft:`3px solid ${T.violet}`,borderRadius:"0 7px 7px 0",fontSize:12}}><span>💡</span><span>Startup-minded — connect with SBU entrepreneurship cell</span></div>}
+            <div style={{display:"flex",gap:8,padding:"9px 13px",background:T.teal+"0C",borderLeft:`3px solid ${T.teal}`,borderRadius:"0 7px 7px 0",fontSize:12}}><span>✅</span><span>Verify internship placement status and update records for {sel.name}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Industry Portal ───────────────────────────────────────────────────────────
+function IndustryPortal({role}){
+  const [sub,setSub]=useState("postings");
+  const tabs=[{id:"postings",label:"📢 Internship Board",sub:"Open to all users"},...(role!=="student"?[{id:"talent",label:"🔒 Talent Database",sub:"Industry & Mentor only"}]:[])];
+  return <div>
+    <div style={{display:"flex",gap:4,marginBottom:20,background:T.card,border:`1px solid ${T.border}`,borderRadius:11,padding:4,width:"fit-content"}}>
+      {tabs.map(t=><button key={t.id} onClick={()=>setSub(t.id)} style={{padding:"9px 18px",borderRadius:8,border:"none",cursor:"pointer",background:sub===t.id?T.ink:"transparent",color:sub===t.id?"#fff":T.muted,fontSize:13,fontWeight:600,transition:"all 0.15s"}}>
+        {t.label}<div style={{fontSize:9.5,fontWeight:400,color:sub===t.id?"#94A3B8":T.light,marginTop:1}}>{t.sub}</div>
+      </button>)}
+    </div>
+    {sub==="postings"?<InternshipBoard/>:<TalentDB/>}
+  </div>;
+}
+
+function InternshipBoard(){
+  return <div>
+    <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:22}}>
+      {INTERNSHIPS.map(p=><div key={p.id} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:13,padding:"16px 20px"}}>
+        <div style={{display:"flex",gap:14,alignItems:"flex-start"}}>
+          <div style={{width:48,height:48,borderRadius:11,background:T.ink,display:"flex",alignItems:"center",justifyContent:"center",color:T.tealL,fontSize:15,fontWeight:800,flexShrink:0,fontFamily:"'Sora',sans-serif"}}>{p.logo}</div>
+          <div style={{flex:1}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+              <div style={{fontSize:14,fontWeight:700}}>{p.role}</div>
+              <Chip label="Accepting Apps" color={T.emerald}/>
+            </div>
+            <div style={{fontSize:12,color:T.muted,marginBottom:7}}>{p.company} · {p.location} · {p.duration}</div>
+            <div style={{fontSize:13,color:T.text,lineHeight:1.6,marginBottom:9}}>{p.desc}</div>
+            <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:8}}>
+              {p.skills.map(s=><span key={s} style={{background:"#F3F4F6",color:T.text,padding:"2px 8px",borderRadius:5,fontSize:11.5,fontWeight:500}}>{s}</span>)}
+            </div>
+            <div style={{display:"flex",gap:18,fontSize:12,color:T.muted}}>
+              <span>💰 {p.stipend}</span><span>📅 Deadline: {p.deadline}</span><span>✉️ {p.contact}</span>
+            </div>
+          </div>
+          <div style={{flexShrink:0}}>
+            <button style={{padding:"8px 18px",borderRadius:8,border:"none",background:T.teal,color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer",display:"block",marginBottom:7}}>Apply →</button>
+            <button style={{padding:"8px 18px",borderRadius:8,border:`1px solid ${T.border}`,background:"transparent",color:T.muted,fontSize:12,cursor:"pointer"}}>Save</button>
+          </div>
+        </div>
+      </div>)}
+    </div>
+    <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:13,padding:"18px 22px"}}>
+      <div style={{fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:12}}>🎯 AI-Matched Graduate Roles</div>
+      {JOBS.map((j,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 14px",background:T.bg,borderRadius:9,border:`1px solid ${T.border}`,marginBottom:9}}>
+        <div style={{width:42,height:42,borderRadius:9,background:T.ink,display:"flex",alignItems:"center",justifyContent:"center",color:T.tealL,fontSize:13,fontWeight:800,flexShrink:0,fontFamily:"'Sora',sans-serif"}}>{j.logo}</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:13,fontWeight:600}}>{j.role}</div>
+          <div style={{fontSize:12,color:T.muted}}>{j.company}</div>
+          <div style={{display:"flex",gap:5,marginTop:5,flexWrap:"wrap"}}>{j.skills.map(s=><span key={s} style={{background:"#F3F4F6",color:T.text,padding:"2px 7px",borderRadius:4,fontSize:10.5,fontWeight:500}}>{s}</span>)}</div>
+        </div>
+        <div style={{textAlign:"center",minWidth:50}}>
+          <div style={{fontSize:20,fontWeight:800,color:j.match>=88?T.emerald:j.match>=80?T.teal:T.gold,fontFamily:"'Sora',sans-serif"}}>{j.match}%</div>
+          <div style={{fontSize:10,color:T.muted}}>match</div>
+        </div>
+        <button style={{padding:"7px 13px",borderRadius:7,border:"none",background:T.teal,color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer"}}>Apply →</button>
+      </div>)}
+    </div>
+  </div>;
+}
+
+function TalentDB(){
+  const [sel,setSel]=useState(STUDENTS[0]);
+  const [fi,setFi]=useState("all");
+  const [fw,setFw]=useState("all");
+  const allI=[...new Set(STUDENTS.flatMap(s=>s.interests))].sort();
+  const filt=STUDENTS.filter(s=>(fi==="all"||s.interests.includes(fi))&&(fw==="all"||s.work===fw));
+  return <div>
+    <div style={{background:T.rose+"07",border:`1px solid ${T.rose}22`,borderRadius:11,padding:"13px 18px",marginBottom:18,display:"flex",gap:11,alignItems:"center"}}>
+      <span style={{fontSize:18}}>🔒</span>
+      <div>
+        <div style={{fontSize:13,fontWeight:700,color:T.rose}}>Restricted View — Industry Partners &amp; Mentors Only</div>
+        <div style={{fontSize:12,color:T.muted,marginTop:2}}>Student profiles for talent scouting under SBU Industry Partnership Agreement. Not visible to students.</div>
+      </div>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:11,marginBottom:18}}>
+      <StatBox icon="👥" label="Candidates" val={STUDENTS.length} sub="This cohort" color={T.teal}/>
+      <StatBox icon="🎯" label="Job-Seeking" val={STUDENTS.filter(s=>s.goal==="Job at company").length} sub="Open to offers" color={T.emerald}/>
+      <StatBox icon="🏠" label="Onsite" val={STUDENTS.filter(s=>s.work==="Onsite").length} sub="In-office ready" color={T.violet}/>
+      <StatBox icon="💻" label="Remote/Hybrid" val={STUDENTS.filter(s=>s.work!=="Onsite").length} sub="Flexible" color={T.sky}/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"270px 1fr",gap:16}}>
+      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:13,padding:11,maxHeight:"65vh",display:"flex",flexDirection:"column"}}>
+        <div style={{fontSize:12.5,fontWeight:700,marginBottom:9,fontFamily:"'Sora',sans-serif"}}>Filter ({filt.length})</div>
+        <select value={fi} onChange={e=>setFi(e.target.value)} style={{padding:"6px 9px",borderRadius:7,border:`1px solid ${T.border}`,fontSize:11,marginBottom:7,outline:"none",background:T.bg}}>
+          <option value="all">All Interests</option>{allI.map(i=><option key={i}>{i}</option>)}
+        </select>
+        <select value={fw} onChange={e=>setFw(e.target.value)} style={{padding:"6px 9px",borderRadius:7,border:`1px solid ${T.border}`,fontSize:11,marginBottom:9,outline:"none",background:T.bg}}>
+          <option value="all">All Work Types</option><option>Onsite</option><option>Remote</option><option>Hybrid</option>
+        </select>
+        <div style={{overflowY:"auto",flex:1}}>
+          {filt.map((s,i)=><div key={s.id} onClick={()=>setSel(s)} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 7px",borderRadius:8,cursor:"pointer",background:sel.id===s.id?T.emerald+"12":"transparent",border:sel.id===s.id?`1px solid ${T.emerald}35`:"1px solid transparent",marginBottom:3}}>
+            <Av ini={s.ini} size={30} idx={i}/>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:12,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</div>
+              <div style={{fontSize:10,color:T.muted}}>{s.deg} · {s.work}</div>
+            </div>
+            <Chip label={`${s.ready}%`} color={s.ready>=75?T.emerald:s.ready>=60?T.teal:T.gold}/>
+          </div>)}
+        </div>
+      </div>
+      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:13,padding:"20px 24px"}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:14,marginBottom:16}}>
+          <Av ini={sel.ini} size={56} idx={STUDENTS.findIndex(s=>s.id===sel.id)}/>
+          <div style={{flex:1}}>
+            <div style={{display:"flex",gap:9,alignItems:"center"}}>
+              <div style={{fontSize:18,fontWeight:800,fontFamily:"'Sora',sans-serif"}}>{sel.name}</div>
+              <Chip label={sel.work} color={T.teal}/>
+            </div>
+            <div style={{fontSize:12,color:T.muted,marginTop:3}}>{sel.deg} · {sel.uni}</div>
+            <div style={{fontSize:12,color:T.muted}}>Yr {sel.yr} · Sem {sel.sem} · CGPA <strong style={{color:sel.cgpa>=3.5?T.emerald:sel.cgpa>=3.0?T.teal:T.gold}}>{sel.cgpa.toFixed(2)}</strong></div>
+            <div style={{display:"flex",gap:5,marginTop:8,flexWrap:"wrap"}}>{sel.interests.map(t=><span key={t} style={{background:T.teal+"15",color:T.teal,padding:"3px 9px",borderRadius:6,fontSize:11,fontWeight:500}}>{t}</span>)}</div>
+          </div>
+          <Ring score={sel.ready} size={76}/>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+          <div>
+            <div style={{fontSize:12.5,fontWeight:700,marginBottom:9}}>Skill Profile</div>
+            {sel.pskills.map(s=><div key={s.n} style={{marginBottom:8}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12}}>{s.n}</span><span style={{fontSize:12,fontWeight:700,color:s.v>=70?T.emerald:s.v>=55?T.teal:T.gold}}>{s.v}%</span></div>
+              <Pbar v={s.v} color={s.v>=70?T.emerald:s.v>=55?T.teal:T.gold} h={5}/>
+            </div>)}
+          </div>
+          <div>
+            <div style={{fontSize:12.5,fontWeight:700,marginBottom:9}}>Contact</div>
+            <div style={{background:T.bg,borderRadius:9,padding:"11px 13px",marginBottom:12}}>
+              {[{l:"ID",v:sel.sid},{l:"Email",v:sel.email},{l:"Phone",v:sel.phone},{l:"Gender",v:sel.gender}].map(d=><div key={d.l} style={{display:"flex",gap:8,padding:"4px 0",borderBottom:`1px solid ${T.border}`}}>
+                <span style={{fontSize:11,color:T.muted,minWidth:55}}>{d.l}</span>
+                <span style={{fontSize:11,fontWeight:600,wordBreak:"break-all"}}>{d.v}</span>
+              </div>)}
+            </div>
+            <button style={{width:"100%",padding:"10px",borderRadius:9,border:"none",background:T.ink,color:"#fff",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>📧 Invite to Interview</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── AI Mock Interview — FULLY WORKING with Anthropic API ──────────────────────
+function MockInterview({user}){
+  const defaultS=user&&user.role==="student"
+    ?(STUDENTS.find(s=>s.name.toLowerCase().includes((user.name||"").toLowerCase().split(" ")[0]))||STUDENTS[0])
+    :STUDENTS[0];
+
+  const [selS,setSelS]=useState(defaultS);
+  const [msgs,setMsgs]=useState([]);
+  const [input,setInput]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [score,setScore]=useState(null);
+  const [started,setStarted]=useState(false);
+  const bottomRef=useRef();
+
+  const greeting=s=>`Hi ${s.name}! I'm your AI interview coach.\n\nYou're a ${s.deg} student interested in ${s.interests.join(" & ")}, aiming for "${s.goal}". Let's run a mock interview tailored to your background.\n\nI'll ask you one question at a time. After each answer I'll give you honest feedback, then move to the next question. Ready?\n\n**First question:** Tell me about yourself — your background, what you've been working on, and why you're interested in ${s.interests[0]}.`;
+
+  const startSession=()=>{
+    setMsgs([{role:"ai",text:greeting(selS)}]);
+    setStarted(true);
+    setScore(null);
+    setInput("");
+  };
+
+  const changeStudent=s=>{
+    setSelS(s);
+    setStarted(false);
+    setMsgs([]);
+    setScore(null);
+    setInput("");
+  };
+
+  const send=async()=>{
+    if(!input.trim()||loading||!started)return;
+    const userText=input.trim();
+    const newMsgs=[...msgs,{role:"user",text:userText}];
+    setMsgs(newMsgs);
+    setInput("");
+    setLoading(true);
+    try{
+      const res=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true"},
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514",
+          max_tokens:500,
+          system:`You are an experienced technical interviewer at a top Pakistani software company (Systems Limited, Arbisoft, 10Pearls). You are conducting a mock job interview for ${selS.name}.
+
+Candidate profile:
+- Degree: ${selS.deg} at ${selS.uni}
+- Year ${selS.yr}, Semester ${selS.sem}, CGPA: ${selS.cgpa}
+- Skills: ${selS.skills}
+- Interests: ${selS.interests.join(", ")}
+- Career goal: ${selS.goal}
+- Work preference: ${selS.work}
+
+Your job:
+1. Read the candidate's answer carefully
+2. Give ONE line of specific, honest feedback (what was strong, what was missing or vague)
+3. Ask ONE new follow-up or next interview question relevant to their skills/goal
+4. Alternate between technical (skills-based) and behavioural (situation-based) questions
+5. Keep your entire reply under 5 sentences
+6. Never repeat a question already asked
+7. Use **bold** for the question you ask at the end`,
+          messages:newMsgs.map(m=>({role:m.role==="ai"?"assistant":"user",content:m.text}))
+        })
+      });
+      const data=await res.json();
+      if(data.error){
+        setMsgs(m=>[...m,{role:"ai",text:`⚠️ API Error: ${data.error.message}\n\nMake sure you are connected to the internet and the Anthropic API key is configured.`}]);
+      } else {
+        const aiText=data.content?.[0]?.text||"Something went wrong. Please try again.";
+        setMsgs(m=>[...m,{role:"ai",text:aiText}]);
+        const userCount=newMsgs.filter(m=>m.role==="user").length;
+        if(userCount>=3&&!score){
+          const avgLen=newMsgs.filter(m=>m.role==="user").reduce((s,m)=>s+m.text.length,0)/userCount;
+          setScore(Math.min(95,Math.max(38,48+Math.round(avgLen/9)+Math.round(selS.ready/5))));
+        }
+      }
+    }catch(e){
+      setMsgs(m=>[...m,{role:"ai",text:`⚠️ Network error — please check your internet connection.\n\nError: ${e.message}`}]);
+    }
+    setLoading(false);
+    setTimeout(()=>bottomRef.current?.scrollIntoView({behavior:"smooth"}),100);
+  };
+
+  const renderText=t=>{
+    // Simple bold rendering
+    return t.split(/(\*\*[^*]+\*\*)/).map((part,i)=>{
+      if(part.startsWith("**")&&part.endsWith("**"))
+        return <strong key={i} style={{color:T.teal}}>{part.slice(2,-2)}</strong>;
+      return <span key={i}>{part}</span>;
+    });
+  };
+
+  return <div>
+    {/* Student picker */}
+    <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:13,padding:"16px 20px",marginBottom:14}}>
+      <div style={{fontSize:13,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:10}}>🎤 Select Candidate for Mock Interview</div>
+      <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+        {STUDENTS.map((m,i)=><div key={m.id} onClick={()=>changeStudent(m)} style={{display:"flex",alignItems:"center",gap:7,padding:"5px 10px",borderRadius:8,cursor:"pointer",background:selS.id===m.id?T.teal:T.bg,border:`1px solid ${selS.id===m.id?T.teal:T.border}`,transition:"all 0.12s"}}>
+          <Av ini={m.ini} size={22} idx={i}/>
+          <span style={{fontSize:11,fontWeight:600,color:selS.id===m.id?"#fff":T.text}}>{m.name.split(" ")[0]}</span>
+        </div>)}
+      </div>
+    </div>
+
+    <div style={{display:"grid",gridTemplateColumns:"1fr 270px",gap:14}}>
+      {/* Chat area */}
+      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:13,padding:"18px 22px",display:"flex",flexDirection:"column",minHeight:520}}>
+        {/* Header */}
+        <div style={{display:"flex",alignItems:"center",gap:11,marginBottom:14,paddingBottom:13,borderBottom:`1px solid ${T.border}`}}>
+          <Av ini={selS.ini} size={38} idx={STUDENTS.findIndex(m=>m.id===selS.id)}/>
+          <div style={{flex:1}}>
+            <div style={{fontSize:14,fontWeight:700}}>{selS.name}</div>
+            <div style={{fontSize:12,color:T.muted}}>{selS.deg} · {selS.goal} · CGPA {selS.cgpa}</div>
+          </div>
+          {started&&<div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{width:7,height:7,borderRadius:"50%",background:T.emerald,animation:"blink 1.5s infinite"}}/>
+            <span style={{fontSize:12,fontWeight:600,color:T.emerald}}>Live</span>
+          </div>}
+        </div>
+
+        {/* Not started state */}
+        {!started&&<div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:16,padding:"30px 0"}}>
+          <div style={{fontSize:48}}>🎙️</div>
+          <div style={{textAlign:"center"}}>
+            <div style={{fontSize:16,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:6}}>Ready to start?</div>
+            <div style={{fontSize:13,color:T.muted,maxWidth:320,lineHeight:1.6}}>AI will ask real interview questions tailored to {selS.name}'s skills, background, and career goal. Answers are evaluated live.</div>
+          </div>
+          <button onClick={startSession} style={{padding:"13px 32px",borderRadius:11,border:"none",background:`linear-gradient(135deg,${T.teal},${T.tealD})`,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:`0 4px 16px ${T.teal}40`}}>Start Interview →</button>
+        </div>}
+
+        {/* Messages */}
+        {started&&<div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:11,marginBottom:14,maxHeight:360}}>
+          {msgs.map((m,i)=><div key={i} style={{display:"flex",gap:9,alignItems:"flex-start",flexDirection:m.role==="user"?"row-reverse":"row",animation:"fadeIn 0.2s ease"}}>
+            <div style={{width:32,height:32,borderRadius:"50%",background:m.role==="ai"?T.ink:T.teal,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:"#fff",fontSize:14}}>
+              {m.role==="ai"?"🤖":selS.ini[0]}
+            </div>
+            <div style={{maxWidth:"78%",padding:"10px 14px",borderRadius:m.role==="ai"?"4px 13px 13px 13px":"13px 4px 13px 13px",background:m.role==="ai"?T.bg:T.teal+"14",fontSize:13,lineHeight:1.7,color:T.text,whiteSpace:"pre-wrap"}}>
+              {m.role==="ai"?renderText(m.text):m.text}
+            </div>
+          </div>)}
+          {loading&&<div style={{display:"flex",gap:9,alignItems:"center"}}>
+            <div style={{width:32,height:32,borderRadius:"50%",background:T.ink,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>🤖</div>
+            <div style={{padding:"10px 14px",borderRadius:"4px 13px 13px 13px",background:T.bg,fontSize:13,color:T.muted}}>
+              <span style={{animation:"blink 1s infinite"}}>Thinking…</span>
+            </div>
+          </div>}
+          <div ref={bottomRef}/>
+        </div>}
+
+        {/* Input */}
+        {started&&<div style={{display:"flex",gap:9,paddingTop:13,borderTop:`1px solid ${T.border}`}}>
+          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()} placeholder={`Answer as ${selS.name.split(" ")[0]}…`} style={{flex:1,padding:"10px 14px",borderRadius:9,border:`1.5px solid ${input.trim()?T.teal:T.border}`,fontSize:13,outline:"none",transition:"border 0.15s"}}/>
+          <button onClick={send} disabled={loading||!input.trim()} style={{padding:"10px 20px",borderRadius:9,border:"none",background:loading||!input.trim()?T.light:T.teal,color:loading||!input.trim()?T.muted:"#fff",fontSize:13,fontWeight:700,cursor:loading||!input.trim()?"not-allowed":"pointer",transition:"all 0.15s",fontFamily:"'Sora',sans-serif",minWidth:70}}>
+            {loading?"…":"Send"}
+          </button>
+        </div>}
+      </div>
+
+      {/* Right panel */}
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:13,padding:"16px 18px"}}>
+          <div style={{fontSize:13,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:10}}>Candidate Profile</div>
+          <div style={{display:"flex",justifyContent:"center",marginBottom:8}}><Ring score={selS.ready} size={90}/></div>
+          <div style={{fontSize:11,color:T.muted,textAlign:"center",marginBottom:12}}>Career Readiness Score</div>
+          {[{l:"Degree",v:selS.deg},{l:"CGPA",v:selS.cgpa.toFixed(2)},{l:"Goal",v:selS.goal},{l:"Work Pref",v:selS.work}].map(d=><div key={d.l} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:`1px solid ${T.border}`,fontSize:12}}>
+            <span style={{color:T.muted}}>{d.l}</span><span style={{fontWeight:600}}>{d.v}</span>
+          </div>)}
+          <div style={{marginTop:10}}>
+            <div style={{fontSize:11,color:T.muted,marginBottom:5}}>Key Interests</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{selS.interests.map(t=><span key={t} style={{background:T.teal+"15",color:T.teal,padding:"2px 8px",borderRadius:5,fontSize:10.5,fontWeight:500}}>{t}</span>)}</div>
+          </div>
+        </div>
+
+        {score&&<div style={{background:T.card,border:`1px solid ${T.emerald}30`,borderRadius:13,padding:"16px 18px",animation:"fadeIn 0.3s ease"}}>
+          <div style={{fontSize:13,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:8}}>📊 Session Score</div>
+          <div style={{fontSize:34,fontWeight:800,color:T.emerald,fontFamily:"'Sora',sans-serif",lineHeight:1}}>{score}</div>
+          <div style={{fontSize:11,color:T.muted,marginBottom:8}}>/100 · {msgs.filter(m=>m.role==="user").length} answers</div>
+          <Pbar v={score} color={score>=75?T.emerald:score>=55?T.teal:T.gold} h={7}/>
+          <div style={{fontSize:11.5,color:T.muted,marginTop:8,lineHeight:1.5}}>{score>=80?"Strong performance — ready for real interviews":score>=65?"Solid foundation — keep practising":"More preparation needed — focus on clarity"}</div>
+        </div>}
+
+        <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:13,padding:"16px 18px"}}>
+          <div style={{fontSize:13,fontWeight:700,fontFamily:"'Sora',sans-serif",marginBottom:9}}>💡 Tips</div>
+          {["Use STAR format for situational questions","Be specific — name the tools you used","Keep answers focused, under 90 seconds","Ask a question back to show initiative","Research the company before real interviews"].map((t,i)=><div key={i} style={{display:"flex",gap:7,fontSize:12,color:T.muted,marginBottom:7,lineHeight:1.5}}>
+            <span style={{color:T.teal,flexShrink:0}}>→</span>{t}
+          </div>)}
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Nav config ────────────────────────────────────────────────────────────────
+const NAVS={
+  student:[{id:"dashboard",label:"Dashboard",icon:"🏠"},{id:"roster",label:"Classmates",icon:"👥"},{id:"fyp",label:"FYP Tracker",icon:"🏗️"},{id:"recs",label:"Recommendations",icon:"💡"},{id:"industry",label:"Internships",icon:"🏢"},{id:"interview",label:"AI Mock Interview",icon:"🎤"}],
+  mentor: [{id:"dashboard",label:"Dashboard",icon:"🏠"},{id:"roster",label:"All Students",icon:"👥"},{id:"fyp",label:"FYP Tracker",icon:"🏗️"},{id:"mentor",label:"Mentor Dashboard",icon:"🎓"},{id:"industry",label:"Industry Portal",icon:"🏢"}],
+  industry:[{id:"dashboard",label:"Overview",icon:"🏠"},{id:"industry",label:"Industry Portal",icon:"🏢"},{id:"fyp",label:"FYP Tracker",icon:"🏗️"}]
+};
+const PTITLES={dashboard:"Dashboard",roster:"Students",fyp:"FYP Tracker",recs:"Recommendations",mentor:"Mentor Dashboard",industry:"Industry Portal",interview:"AI Mock Interview"};
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App(){
+  const [user,setUser]=useState(null);
+  const [page,setPage]=useState("dashboard");
+  const rc={student:T.teal,mentor:T.violet,industry:T.emerald};
+
+  if(!user)return <Login onLogin={u=>{setUser(u);setPage("dashboard");}}/>;
+
+  const nav=NAVS[user.role]||NAVS.student;
+  const render=()=>{
+    switch(page){
+      case"dashboard":return <Dashboard/>;
+      case"roster":return <Roster/>;
+      case"fyp":return <FYPTracker/>;
+      case"recs":return <Recommendations/>;
+      case"mentor":return <MentorDashboard/>;
+      case"industry":return <IndustryPortal role={user.role}/>;
+      case"interview":return <MockInterview user={user}/>;
+      default:return <Dashboard/>;
+    }
+  };
+
+  return <div style={{fontFamily:"'DM Sans','Segoe UI',sans-serif",background:T.bg,minHeight:"100vh",display:"flex",color:T.text}}>
+    {/* Sidebar */}
+    <div style={{width:224,background:T.ink,display:"flex",flexDirection:"column",minHeight:"100vh",position:"sticky",top:0,flexShrink:0}}>
+      <div style={{padding:"16px 18px 14px",borderBottom:`1px solid ${T.inkLL}`}}><Logo/></div>
+
+      {/* User pill */}
+      <div style={{margin:"10px 12px 4px",padding:"9px 11px",background:T.inkLL,borderRadius:9,display:"flex",alignItems:"center",gap:9}}>
+        <div style={{width:30,height:30,borderRadius:"50%",background:rc[user.role]+"25",border:`1.5px solid ${rc[user.role]}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>
+          {{student:"🎓",mentor:"👨‍🏫",industry:"🏢"}[user.role]}
+        </div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{color:"#fff",fontSize:12,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{user.name}</div>
+          <div style={{color:rc[user.role],fontSize:10,fontWeight:600,textTransform:"capitalize"}}>{user.role}</div>
+        </div>
+        <button onClick={()=>{setUser(null);setPage("dashboard");}} title="Sign out" style={{background:"none",border:"none",color:"#374151",cursor:"pointer",fontSize:15,lineHeight:1,padding:2}}>×</button>
+      </div>
+
+      <div style={{flex:1,padding:"8px 0"}}>
+        {nav.map(n=><div key={n.id} onClick={()=>setPage(n.id)} style={{display:"flex",alignItems:"center",gap:9,padding:"9px 18px",cursor:"pointer",borderLeft:page===n.id?`3px solid ${T.teal}`:"3px solid transparent",background:page===n.id?T.tealD+"28":"transparent",color:page===n.id?"#fff":"#94A3B8",fontSize:13,fontWeight:page===n.id?600:400,transition:"all 0.12s"}}>
+          <span style={{fontSize:14}}>{n.icon}</span><span>{n.label}</span>
+        </div>)}
+      </div>
+
+      <div style={{padding:"10px 12px",borderTop:`1px solid ${T.inkLL}`}}>
+        <div style={{color:"#374151",fontSize:9.5,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:7}}>Cohort</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+          {STUDENTS.map((m,i)=><div key={m.id} title={m.name} style={{cursor:"pointer"}} onClick={()=>setPage("roster")}>
+            <Av ini={m.ini} size={22} idx={i} extra={{border:`2px solid ${T.inkLL}`}}/>
+          </div>)}
+        </div>
+      </div>
+    </div>
+
+    {/* Main */}
+    <div style={{flex:1,overflow:"auto"}}>
+      <div style={{background:T.card,borderBottom:`1px solid ${T.border}`,padding:"0 26px",display:"flex",alignItems:"center",justifyContent:"space-between",height:56,position:"sticky",top:0,zIndex:10}}>
+        <div style={{fontSize:15,fontWeight:700,fontFamily:"'Sora',sans-serif"}}>{PTITLES[page]||"Dashboard"}</div>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <span style={{fontSize:12,color:T.muted}}>{STUDENTS.length} students</span>
+          <span style={{background:T.teal+"15",color:T.teal,padding:"3px 11px",borderRadius:20,fontSize:11,fontWeight:700}}>Avg Readiness: {avgReady}%</span>
+          <Mark size={30}/>
+        </div>
+      </div>
+      <div style={{padding:"22px 26px"}}>{render()}</div>
+    </div>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
